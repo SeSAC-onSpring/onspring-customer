@@ -1,4 +1,4 @@
-package com.onspring.onspring_customer.domain.common;
+package com.onspring.onspring_customer.domain.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
@@ -17,8 +17,8 @@ public class BaseEntity {
 
     @CreatedDate
     @Column(updatable = false)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
-    private LocalDateTime updated_at;
+    private LocalDateTime updatedAt;
 }
