@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layout(~{::div}, 'settlement-registration', ~{::title})">
+<head>
+  <title>정산 - SeSAC 회원 관리</title>
+</head>
+<body>
+<div class="content-container">
+  <!-- 페이지 경로 -->
+  <div class="page-path">
+    <span class="path-item">정산 관리</span>
+    <span class="path-separator">></span>
+    <span class="path-item current">정산</span>
+  </div>
+
+
+  <!-- 전체 선택 버튼-->
+  <div style="margin-top: 20px; margin-bottom: 10px; text-align: right;" >
+    <button id="allCheck" onclick="toggleAllCheckboxes()" style="background-color: #f2f2f2; color: black; border: none; border-radius: 4px; padding: 8px 15px; cursor: pointer; margin-left: 10px;">전체 선택</button>
+  </div>
+
+  <!-- 회원 목록 테이블 -->
+  <div class="form-container">
+    <table style="width: 100%; border-collapse: collapse; text-align: center;">
+      <thead>
+      <tr style="background-color: #f2f2f2; height: 40px;">
+        <th style="width: 5%;">No</th>
+        <th style="width: 10%;">일시</th>
+        <th style="width: 20%;">가맹점명</th>
+        <th style="width: 10%;">대표자</th>
+        <th style="width: 10%;">전화번호</th>
+        <th style="width: 15%;">주소</th>
+        <th style="width: 5%;">결제금액</th>
+        <th style="width: 5%;">선택</th>
+
+      </tr>
+      </thead>
+      <tbody>
+      <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;">
+        <td>1</td>
+        <td>2024.02.01 13:00:24</td>
+        <td>압구정샌드위치 녹번점</td>
+        <td>홍동길</td>
+        <td>01027616548</td>
+        <td>서울 은평구 은평로 240 (응암동, 힐스테이트녹번역) 제상가동 제지2층 제비306호</td>
+        <td>8,400</td>
+        <td>
+          <input type="checkbox" name="selectedMember" value="3" class="member-checkbox" style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+        </td>
+      </tr>
+      <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;">
+        <td>2</td>
+        <td>2024.02.01 13:00:24</td>
+        <td>맛을찾아마라탕</td>
+        <td>이길동</td>
+        <td>01027651322</td>
+        <td>서울 은평구 은평로 240 (응암동, 힐스테이트녹번역) 제상가동 제지2층 제비306호</td>
+        <td>10,000</td>
+        <td>
+          <input type="checkbox" name="selectedMember" value="2" class="member-checkbox" style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 정산 버튼 -->
+  <div style="margin-top: 10px; text-align: right;">
+    <button id="deactivateBtn" th:onclick="'deactivateMembers()'" style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 8px 15px; cursor: pointer; margin-left: 10px;">정산</button>
+  </div>
+
+  <script>
+    // 전체선택 버튼
+    let allChecked = false;
+
+    function toggleAllCheckboxes() {
+
+      allChecked = !allChecked;
+
+      const checkboxes = document.querySelectorAll('.member-checkbox');
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = allChecked;
+      });
+
+      const allCheckBtn = document.getElementById('allCheck');
+      allCheckBtn.textContent = allChecked ? '전체 해제' : '전체 선택';
+    }
+
+    // 정산 버튼
+    function deactivateMembers() {
+      const selectedMembers = document.querySelectorAll('input[name="selectedMember"]:checked');
+
+      if (selectedMembers.length === 0) {
+        alert('정산할 내역을 선택해주세요.');
+        return;
+      }
+
+      if (confirm(selectedMembers.length + '개의 내역을 정산하시겠습니까?')) {
+        alert('선택한 내역이 정산되었습니다.');
+      }
+    }
+
+
+  </script>
+</div>
+</body>
+</html>

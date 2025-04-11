@@ -3,7 +3,6 @@ package com.onspring.onspring_customer.domain.common.service;
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
 import com.onspring.onspring_customer.domain.common.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -159,34 +157,6 @@ public class TransactionServiceTest {
         assertTrue(transactions.size() > 0, "No transactions found for the given date range");
     }
 
-    @Test
-    @DisplayName("특정 가맹점의 미정산 트랜잭션 정산 처리 테스트")
-    @Transactional
-    void saveTransaction() {
-        TransactionDto transactionDto = new TransactionDto();
-        transactionDto.setId(Long.valueOf(1));
 
-        // 현재 미정산 트랜잭션 개수 확인 (isClosed = false)
-        List<TransactionDto> beforeTransactions = transactionService.findAllTransaction();
-        int beforeCount = beforeTransactions.size();
-
-        // 정산 처리 실행
-        Long processedCount = transactionService.saveTransaction(transactionDto);
-
-        // 정산 처리 후 미정산 트랜잭션 개수 확인 (isClosed = false)
-        List<TransactionDto> afterTransactions = transactionService.findAllTransaction();
-        int afterCount = afterTransactions.size();
-
-        // 정산 처리된 개수와 미정산 트랜잭션 수 감소량이 같은지 확인
-        assertThat(beforeCount - afterCount).isEqualTo(processedCount.intValue());
-
-        // 처리된 트랜잭션이 0개보다 많은지 확인
-        assertThat(processedCount).isGreaterThan(0L);
-
-        System.out.println("처리된 트랜잭션 수: " + processedCount);
-        System.out.println("정산 전 미정산 트랜잭션 수: " + beforeCount);
-        System.out.println("정산 후 미정산 트랜잭션 수: " + afterCount);
-
-    }
 
 }

@@ -1,7 +1,6 @@
 package com.onspring.onspring_customer.domain.customer.entity;
 
 import com.onspring.onspring_customer.domain.common.entity.BaseEntity;
-import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import com.onspring.onspring_customer.domain.user.entity.Point;
 import jakarta.persistence.*;
@@ -11,8 +10,8 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -74,12 +73,9 @@ public class Party extends BaseEntity {
     private boolean isActivated;
 
     @OneToMany(mappedBy = "party")
-    private Set<PartyEndUser> partyEndUsers = new HashSet<>();
+    private List<Point> points = new ArrayList<>();
 
     @OneToMany(mappedBy = "party")
-    private Set<Transaction> transactions = new HashSet<>();
-
-    @OneToMany(mappedBy = "party")
-    private Set<Point> points = new HashSet<>();
+    private List<Transaction> transactions = new ArrayList<>();
 
 }

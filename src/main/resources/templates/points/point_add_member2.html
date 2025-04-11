@@ -1,0 +1,61 @@
+<!-- 포인트 관리 -> 포인트 지급 페이지에서 충전 버튼 눌렀을 때 두번째페이지-->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layout(~{::div}, 'member-manage', ~{::title})">
+<head>
+    <title>포인트 충전 - 포인트 지급</title>
+
+
+</head>
+<body>
+<div class="content-container">
+    <!-- 페이지 경로 -->
+    <div class="page-path">
+        <span class="path-item">포인트 지급 충전</span>
+        <span class="path-separator">></span>
+        <span class="path-item current">포인트 충전</span>
+    </div>
+
+    <form action="point" method="post">
+        <!-- 회원 추가 폼 -->
+        <div class="form-container">
+            <table class="form-table">
+                <tr>
+                    <th>선택한 그룹</th>
+                    <td th:text="${party.name}"></td>
+                </tr>
+                <tr>
+                    <th>선택된 회원</th>
+                    <td th:text="${#strings.listJoin(endUsers.![name], ', ')}"></td>
+                    <input type="hidden" name="userIds" th:each="endUser : ${endUsers}" th:value="${endUser.id}">
+                </tr>
+                <tr>
+                    <th>충전 포인트</th>
+                    <td>
+                        <input type="number" id="amount" class="form-input" name="amount"
+                               placeholder="20000" required/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>유효 기간</th>
+                    <td>
+                        <input type="datetime-local" name="validThru" id="validThru" required/>
+                    </td>
+                </tr>
+
+            </table>
+        </div>
+
+
+        <div class="btn-container">
+            <button type="submit" class="submit-btn">확인</button>
+            <button type="button" class="cancel-btn">취소</button>
+        </div>
+    </form>
+
+
+</div>
+
+
+</body>
+</html>

@@ -1,13 +1,18 @@
 package com.onspring.onspring_customer.domain.common.repository;
 
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
@@ -34,14 +39,15 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     @Query("SELECT t FROM Transaction t WHERE t.franchise.id = :franchiseId " +
             "AND t.transactionTime BETWEEN :startDate AND :endDate " +
-            "ORDER BY t.id DESC")
+            "ANd t.isClosed = true " +
+            "ORDER BY t.id DESC" )
     List<Transaction> findTransactionsByFranchiseIdAndDateRangeAndClosed(
             @Param("franchiseId") Long franchiseId,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
 
 
-    List<Transaction> findByEndUserIdOrderByTransactionTimeDesc(Long endUserId);
+    Page<Transaction> findByEndUserId(Long endUserId, Pageable pageable);
 
     @Query("SELECT MONTH(t.transactionTime) AS month, YEAR(t.transactionTime) AS year, " +
             "COUNT(t) AS totalTransactions, SUM(t.amount) AS totalAmount " +
@@ -55,4 +61,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findByIsClosed(boolean closed);
 
+    @Query("select t from Transaction t where t.isAccepted = true and t.isClosed = false")
+    Page<Transaction> findByIsAcceptedTrueAndIsClosedFalse(Pageable pageable);
+
+    @Transactional
+    @Modifying
+    @Query("update Transaction t set t.isClosed = false where t.id in ?1 and t.isAccepted = true and t.isClosed = " +
+           "false")
+    int updateIsClosedByIdInAndIsAcceptedTrueAndIsClosedFalse(@NonNull Collection<Long> ids);
 }

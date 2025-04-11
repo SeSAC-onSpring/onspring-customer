@@ -1,0 +1,91 @@
+<!-- 포인트 관리 -> 포인트 지급 페이지에서 충전 버튼 눌렀을 때 첫페이지-->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layout(~{::div}, 'member-manage', ~{::title})">
+<head>
+    <title>포인트 충전 - 포인트 지급</title>
+</head>
+<body>
+<div class="content-container">
+    <!-- 페이지 경로 -->
+    <div class="page-path">
+        <span class="path-item">포인트 지급 충전</span>
+        <span class="path-separator">></span>
+        <span class="path-item current">적용 회원 선택</span>
+    </div>
+
+
+    <!-- 전체 선택 버튼-->
+    <div style="margin-top: 20px; margin-bottom: 10px; text-align: right;">
+        <button id="allCheck" onclick="toggleAllCheckboxes()"
+                style="background-color: #f2f2f2; color: black; border: none; border-radius: 4px; padding: 8px 15px; cursor: pointer; margin-left: 10px;">
+            전체 선택
+        </button>
+    </div>
+
+    <!-- 회원 목록 테이블 -->
+    <div class="form-container">
+        <table style="width: 100%; border-collapse: collapse; text-align: center;">
+            <thead>
+            <tr style="background-color: #f2f2f2; height: 40px;">
+                <th style="width: 5%;">이름</th>
+                <th style="width: 10%;">아이디</th>
+                <th style="width: 8%;">현재 포인트</th>
+                <th style="width: 5%;">선택</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr style="border-bottom: 1px solid #e0e0e0; height: 50px;" th:each="model : ${models}"
+                th:id="${model.endUserDto.id}" th:object="${model}">
+                <td th:text="*{endUserDto.name}"></td>
+                <td th:text="*{endUserDto.phone}"></td>
+                <td th:text="*{pointDto.currentAmount}"></td>
+                <td><input type="checkbox" class="member-checkbox" value="1"/></td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="btn-container">
+        <button type="submit" class="submit-btn" onclick="addPointToUsers()">추가하기</button>
+    </div>
+
+    <script>
+        // 전체선택 버튼
+        let allChecked = false;
+
+        function toggleAllCheckboxes() {
+
+            allChecked = !allChecked;
+
+            const checkboxes = document.querySelectorAll('.member-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = allChecked;
+            });
+
+            const allCheckBtn = document.getElementById('allCheck');
+            allCheckBtn.textContent = allChecked ? '전체 해제' : '전체 선택';
+        }
+
+        function addPointToUsers() {
+            const userIds = [
+                ...document.querySelectorAll("tr[id]:has(input:checked)"),
+            ].map((x) => x.id);
+
+            if (userIds.length === 0) {
+                alert("포인트를 추가할 사용자를 선택해 주세요.");
+                return;
+            }
+
+            let searchParams = new URLSearchParams();
+            searchParams.append("userIds", userIds);
+            window.location.href = window.location.href + "/point?" + searchParams.toString();
+        }
+    </script>
+</div>
+
+
+</body>
+</html>

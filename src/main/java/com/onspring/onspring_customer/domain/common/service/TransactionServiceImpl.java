@@ -2,26 +2,39 @@ package com.onspring.onspring_customer.domain.common.service;
 
 import com.onspring.onspring_customer.domain.common.dto.SettlmentSummaryDto;
 import com.onspring.onspring_customer.domain.common.dto.TransactionDto;
+import com.onspring.onspring_customer.domain.common.entity.QTransaction;
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import com.onspring.onspring_customer.domain.common.repository.TransactionRepository;
+import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
+import com.onspring.onspring_customer.domain.customer.entity.Party;
+import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
-import jakarta.transaction.Transactional;
 import com.onspring.onspring_customer.domain.franchise.entity.Franchise;
 import com.onspring.onspring_customer.domain.franchise.repository.FranchiseRepository;
+import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
 import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,8 +44,9 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final FranchiseRepository franchiseRepository;
     private final EndUserRepository endUserRepository;
+    private final PartyRepository partyRepository;
     private final ModelMapper modelMapper;
-
+    private final JPAQueryFactory queryFactory;
 
 
     // 선택된 미정산 거래 내역(단 한개)가 정산으로 저장됨 isClosed = False -> True => Figma 홈_정산관리_정산확인
@@ -96,6 +110,17 @@ public class TransactionServiceImpl implements TransactionService {
 
         log.info("Successfully closed {} transactions", processedIds.size());
         return processedIds;
+    }
+
+    @Override
+    public Long saveTransaction(TransactionDto transactionDto) {
+        return 0L;
+    }
+
+    @Override
+    public TransactionDto findTransactionById(Long id) {
+        return null;
+    }
 
     /**
      * 사용자의 결제
@@ -103,7 +128,7 @@ public class TransactionServiceImpl implements TransactionService {
      * @return transaction id
      */
     @Override
-    public Long saveTransaction(TransactionDto transactionDto) {
+    public Long saveTransaction(Long partyId, TransactionDto transactionDto) {
         log.info("Saving transaction: {}", transactionDto);
 
         // FranchiseId와 UserId를 통해 가맹점과 사용자 정보를 조회
@@ -115,14 +140,19 @@ public class TransactionServiceImpl implements TransactionService {
                 .orElseThrow(() -> new RuntimeException("EndUser not found"));
         log.info("endUser: " + endUser);
 
+        Party party = partyRepository.findById(partyId)
+                .orElseThrow(() -> new RuntimeException("Party not found"));
+
         // TransactionDto -> Transaction 엔티티로 변환
         Transaction transaction = new Transaction();
         transaction.setFranchise(franchise);
         transaction.setEndUser(endUser);
-        transaction.setTransactionTime(transactionDto.getTransactionTime());
+        transaction.setTransactionTime(LocalDateTime.now());
         transaction.setAmount(transactionDto.getAmount());
         transaction.setAccepted(transactionDto.isAccepted());
         transaction.setClosed(transactionDto.isClosed());
+        transaction.setAccepted(true);
+        transaction.setParty(party);
 
         log.info("Saving transaction: {}", transaction);
 
@@ -131,13 +161,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         // 저장된 트랜잭션 ID 반환
         return savedTransaction.getId();
->>>
     }
 
-    @Override
-    public TransactionDto findTransactionById(Long id) {
-        return null;
-    }
 
 
 
@@ -241,6 +266,58 @@ public class TransactionServiceImpl implements TransactionService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Page<TransactionDto> findAllAcceptedAndNotClosedTransaction(Pageable pageable) {
+        return transactionRepository.findByIsAcceptedTrueAndIsClosedFalse(pageable)
+                .map(element -> modelMapper.map(element, TransactionDto.class));
+    }
+
+    @Override
+    public Page<TransactionDto> findAllTransactionByQuery(String by, String name, LocalDate after, LocalDate before,
+                                                          Pageable pageable) {
+        QTransaction transaction = QTransaction.transaction;
+        JPAQuery<Transaction> query = queryFactory.selectFrom(transaction);
+
+        if (name != null) {
+            query.where(switch (by) {
+                case "franchise" -> transaction.franchise.name.containsIgnoreCase(name);
+                case "party" -> transaction.party.name.containsIgnoreCase(name);
+                case "user" -> transaction.endUser.name.containsIgnoreCase(name);
+                default -> throw new IllegalStateException("Unexpected value: " + by);
+            });
+        }
+        if (after != null) {
+            query.where(transaction.transactionTime.goe(after.atStartOfDay()));
+        }
+        if (before != null) {
+            query.where(transaction.transactionTime.loe(before.atTime(LocalTime.MAX)));
+        }
+
+        Long count = Objects.requireNonNull(query.clone()
+                .select(transaction.count())
+                .fetchOne());
+
+        query.orderBy(transaction.id.desc());
+
+        query.offset(pageable.getOffset());
+        query.limit(pageable.getPageSize());
+
+        List<Transaction> transactions = query.fetch();
+
+        List<TransactionDto> transactionDtoList = transactions.stream()
+                .map(element -> {
+                    TransactionDto transactionDto = modelMapper.map(element, TransactionDto.class);
+                    transactionDto.setFranchiseDto(modelMapper.map(element.getFranchise(), FranchiseDto.class));
+                    transactionDto.setPartyDto(modelMapper.map(element.getParty(), PartyDto.class));
+                    transactionDto.setEndUserDto(modelMapper.map(element.getEndUser(), EndUserDto.class));
+
+                    return transactionDto;
+                })
+                .toList();
+
+        return new PageImpl<>(transactionDtoList, pageable, count);
+    }
+
     /**
      * 특정 가맹점에 대한 결제내역 조회 (이후 페이징등 추가 고려 필요)
      *
@@ -296,17 +373,10 @@ public class TransactionServiceImpl implements TransactionService {
      * @return 해당하는 TransactionDto의 List 객체
      */
     @Override
-    public List<TransactionDto> findTransactionByEndUserId(Long userId) {
-        if (userId == null) {
-            throw new IllegalArgumentException("userId는 null일 수 없습니다.");
-        }
-        List<Transaction> transactionList = transactionRepository.findByEndUserIdOrderByTransactionTimeDesc(userId);
+    public Page<TransactionDto> findTransactionByEndUserId(Long userId, Pageable pageable) {
+        return transactionRepository.findByEndUserId(userId, pageable)
+                .map(transaction -> modelMapper.map(transaction, TransactionDto.class));
 
-        List<TransactionDto> transactionDtoList = transactionList.stream()
-                .map(transaction -> modelMapper.map(transaction, TransactionDto.class))
-                .collect(Collectors.toList());
-
-        return transactionDtoList;
     }
 
     /**
@@ -344,21 +414,6 @@ public class TransactionServiceImpl implements TransactionService {
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid period value: " + period);
-            }
-        } else if (month != null) {
-            // 월이 주어졌을 경우 해당 월의 startDate와 endDate 계산
-            if (!month.matches("\\d{4}.\\d{2}")) {
-                throw new IllegalArgumentException("Invalid month format. Use 'YYYY-MM' format.");
-            }
-            startDate = LocalDateTime.parse(month + "-01T00:00:00");  // 해당 월의 첫 번째 날짜 (00:00:00)
-            endDate = startDate.plusMonths(1).minusNanos(1);  // 해당 월의 마지막 날짜 (23:59:59.999999999)
-        } else if (startDate != null && endDate != null) {
-            // startDate와 endDate가 주어졌을 경우
-            try {
-                startDate = LocalDateTime.parse(startDate + "T00:00:00");
-                endDate = LocalDateTime.parse(endDate + "T23:59:59.999999999");
-            } catch (DateTimeParseException e) {
-                throw new IllegalArgumentException("Invalid date format. Use 'YYYY-MM-DD' format for start and end date.");
             }
         }
 

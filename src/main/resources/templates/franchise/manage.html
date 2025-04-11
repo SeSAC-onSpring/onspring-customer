@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layout(~{::div}, 'franchise-manage', ~{::title})">
+<head>
+  <title>가맹점 관리 - SeSAC 회원 관리</title>
+</head>
+<body>
+<div class="content-container">
+  <!-- 페이지 경로 -->
+  <div class="page-path">
+    <span class="path-item">가맹점 관리</span>
+    <span class="path-separator">></span>
+    <span class="path-item current">가맹점 관리</span>
+  </div>
+
+  <!-- 검색 폼 -->
+  <div class="search-form" style="margin-bottom: 20px;">
+    <form action="#" method="get" style="display: flex;">
+      <select name="searchType" style="width: 150px; padding: 8px; border: 1px solid #ddd; border-radius: 4px 0 0 4px; border-right: none;">
+        <option value="name">가맹점명</option>
+        <option value="salesnumber">사업자번호</option>
+        <option value="ownername">대표자</option>
+        <option value="id">연락처</option>
+      </select>
+      <input type="text" name="keyword" placeholder="검색어를 입력하세요" style="flex-grow: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 0;">
+      <button type="submit" style="width: 80px; background-color: #4CAF50; color: white; border: none; border-radius: 0 4px 4px 0; cursor: pointer;">검색</button>
+    </form>
+  </div>
+
+
+  <!-- 회원 목록 테이블 -->
+  <div class="form-container">
+    <table style="width: 100%; border-collapse: collapse; text-align: center;">
+      <thead>
+      <tr style="background-color: #f2f2f2; height: 40px;">
+        <th style="width: 5%;">No</th>
+        <th style="width: 10%;">가맹점</th>
+        <th style="width: 10%;">사업자번호</th>
+        <th style="width: 10%;">대표자</th>
+        <th style="width: 12%;">연락처</th>
+        <th style="width: 35%;">주소</th>
+        <th style="width: 8%;">정보 수정</th>
+        <th style="width: 5%;">선택</th>
+
+      </tr>
+      </thead>
+      <tbody>
+      <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;">
+        <td>3</td>
+        <td>압구정샌드위치 녹번점</td>
+        <td>2221111225</td>
+        <td>홍동길</td>
+        <td>01065339566</td>
+        <td>서울 은평구 은평로 240 (응암동, 힐스테이트녹제상가동 제지2층 제비 307호)</td>
+        <td>
+          <button style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">수정</button>
+        </td>
+        <td>
+          <input type="checkbox" name="selectedMember" value="3" class="member-checkbox" style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+        </td>
+      </tr>
+      <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;">
+        <td>2</td>
+        <td>맛을찾아마라탕</td>
+        <td>12345556332</td>
+        <td>김동길</td>
+        <td>01066553321</td>
+        <td>서울 은평구 은평로 240 (응암동, 힐스테이트녹제상가동 제지2층 제비 307호)</td>
+        <td>
+          <button style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">수정</button>
+        </td>
+        <td>
+          <input type="checkbox" name="selectedMember" value="2" class="member-checkbox" style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+        </td>
+      </tr>
+      <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;">
+        <td>1</td>
+        <td>응일한정식</td>
+        <td>12312312345</td>
+        <td>이동길</td>
+        <td>01066534456</td>
+        <td>서울 은평구 은평로 240 (응암동, 힐스테이트녹제상가동 제지2층 제비 307호)</td>
+        <td>
+          <button style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">수정</button>
+        </td>
+        <td>
+          <input type="checkbox" name="selectedMember" value="1" class="member-checkbox" style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 비활성화 버튼 -->
+  <div style="margin-top: 10px; text-align: right;">
+    <button id="deactivateBtn" th:onclick="'deactivateMembers()'" style="background-color: #f44336; color: white; border: none; border-radius: 4px; padding: 8px 15px; cursor: pointer; margin-left: 10px;">비활성화</button>
+  </div>
+
+
+
+  <script>
+
+    // 비활성화 버튼
+    function deactivateMembers() {
+      const selectedMembers = document.querySelectorAll('input[name="selectedMember"]:checked');
+
+      if (selectedMembers.length === 0) {
+        alert('비활성화할 가맹점을 선택해주세요.');
+        return;
+      }
+
+      if (confirm(selectedMembers.length + '개의 가맹점을 비활성화하시겠습니까?')) {
+        alert('선택한 가맹점이 비활성화되었습니다.');
+      }
+    }
+
+
+  </script>
+</div>
+</body>
+</html>

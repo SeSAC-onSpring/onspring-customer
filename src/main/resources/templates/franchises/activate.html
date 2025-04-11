@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layout(~{::div}, 'franchise-activated', ~{::title})">
+<head>
+    <title>가맹점 활성화 - SeSAC 회원 관리</title>
+</head>
+<body>
+<div class="content-container">
+    <!-- 페이지 경로 -->
+    <div class="page-path">
+        <span class="path-item">가맹점 관리</span>
+        <span class="path-separator">></span>
+        <span class="path-item current">가맹점 활성화</span>
+    </div>
+
+    <!-- 검색 폼 -->
+    <div class="search-form" style="margin-bottom: 20px;">
+        <form action="#" method="get" style="display: flex;">
+            <select name="searchType"
+                    style="width: 150px; padding: 8px; border: 1px solid #ddd; border-radius: 4px 0 0 4px; border-right: none;">
+                <option value="name">가맹점명</option>
+                <option value="salesnumber">사업자번호</option>
+                <option value="ownername">대표자</option>
+                <option value="id">연락처</option>
+            </select>
+
+            <input type="text" name="keyword" placeholder="검색어를 입력하세요"
+                   style="flex-grow: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 0;">
+            <button type="submit"
+                    style="width: 80px; background-color: #4CAF50; color: white; border: none; border-radius: 0 4px 4px 0; cursor: pointer;">
+                검색
+            </button>
+        </form>
+    </div>
+
+
+    <!-- 회원 목록 테이블 -->
+    <div class="form-container">
+        <table style="width: 100%; border-collapse: collapse; text-align: center;">
+            <thead>
+            <tr style="background-color: #f2f2f2; height: 40px;">
+                <th style="width: 5%;">No</th>
+                <th style="width: 10%;">가맹점</th>
+                <th style="width: 10%;">사업자번호</th>
+                <th style="width: 10%;">대표자</th>
+                <th style="width: 12%;">연락처</th>
+                <th style="width: 35%;">주소</th>
+                <th style="width: 5%;">선택</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;" th:each="franchise : ${franchises}"
+                th:id="${franchise.id}"
+                th:object="${franchise}">
+                <td th:text="*{id}"></td>
+                <td th:text="*{name}"></td>
+                <td th:text="*{businessNumber}"></td>
+                <td th:text="*{ownerName}"></td>
+                <td th:text="*{phone}"></td>
+                <td th:text="*{address}"></td>
+                <td>
+                    <input type="checkbox" name="selectedMember" value="3" class="member-checkbox"
+                           style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 활성화 버튼 -->
+    <div style="margin-top: 10px; text-align: right;">
+        <button id="deactivateBtn" th:onclick="'deactivateMembers()'"
+                style="background-color: dodgerblue; color: white; border: none; border-radius: 4px; padding: 8px 15px; cursor: pointer; margin-left: 10px;">
+            활성화
+        </button>
+    </div>
+
+    <!-- 페이지네이션 -->
+    <div style="margin-top: 30px; text-align: center;" th:if="${totalPages > 1}">
+        <div style="display: inline-block;">
+            <a style="display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; color: #333;"
+               th:if="${currentPage > 1}" th:href="@{activate(page=${currentPage - 1}, size=${size})}">&lt;</a>
+            <th:block th:if="${totalPages <= 7}">
+                <a th:each="pageNum : ${#numbers.sequence(1, totalPages)}"
+                   th:style="'display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; ' + (${pageNum == currentPage} ? 'color: white; background-color: #4CAF50;' : 'color: #333;')"
+                   th:href="@{activate(page=${pageNum}, size=${size})}"
+                   th:text="${pageNum}"></a>
+            </th:block>
+            <th:block th:if="${totalPages > 7}">
+                <a th:style="'display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; ' + (${1 == currentPage} ? 'color: white; background-color: #4CAF50;' : 'color: #333;')"
+                   th:href="@{activate(page=1, size=${size})}" th:text="1"></a>
+                <span style="display: inline-block; padding: 5px 10px; margin: 0 5px;"
+                      th:if="${currentPage > 4}">...</span>
+                <th:block
+                        th:with="start=${currentPage - 2 > 1 ? currentPage - 2 : 2}, end=${currentPage + 2 < totalPages ? currentPage + 2 : totalPages - 1}">
+                    <th:block th:if="${start <= end}">
+                        <a th:each="pageNum : ${#numbers.sequence(start, end)}"
+                           th:style="'display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; ' + (${pageNum == currentPage} ? 'color: white; background-color: #4CAF50;' : 'color: #333;')"
+                           th:href="@{activate(page=${pageNum}, size=${size})}"
+                           th:text="${pageNum}"></a>
+                    </th:block>
+                </th:block>
+                <span style="display: inline-block; padding: 5px 10px; margin: 0 5px;"
+                      th:if="${currentPage < totalPages - 3}">...</span>
+                <a th:if="${totalPages > 1}"
+                   th:style="'display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; ' + (${totalPages == currentPage} ? 'color: white; background-color: #4CAF50;' : 'color: #333;')"
+                   th:href="@{activate(page=${totalPages}, size=${size})}"
+                   th:text="${totalPages}"></a>
+            </th:block>
+            <a style="display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; color: #333;"
+               th:if="${currentPage < totalPages}" th:href="@{activate(page=${currentPage + 1}, size=${size})}">&gt;</a>
+        </div>
+    </div>
+
+    <script>
+
+
+        // 활성화 버튼
+        function deactivateMembers() {
+            const selectedMembers = [
+                ...document.querySelectorAll("tr[id]:has(input:checked)"),
+            ].map((x) => x.id);
+
+            if (selectedMembers.length === 0) {
+                alert('활성화할 가맹점을 선택해주세요.');
+                return;
+            }
+
+            if (confirm(selectedMembers.length + '개의 가맹점을 활성화하시겠습니까?')) {
+                const formData = new FormData();
+                formData.append("ids", selectedMembers);
+
+                fetch("activate", {
+                    method: "PATCH",
+                    body: formData,
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('선택한 가맹점이 활성화되었습니다.');
+
+                        location.reload();
+                    }
+                });
+            }
+        }
+
+
+    </script>
+
+</div>
+</body>
+</html>

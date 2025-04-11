@@ -58,7 +58,7 @@ class PointServiceTest {
         mockPoint.setId(40000L);
         mockPoint.setEndUser(mockUser);
         mockPoint.setParty(mockParty);
-        mockPoint.setAmount(BigDecimal.valueOf(5000));
+        mockPoint.setCurrentAmount(BigDecimal.valueOf(5000));
         mockPoint.setValidThru(LocalDateTime.of(2025, 12, 31, 23, 59));
     }
 
@@ -75,7 +75,7 @@ class PointServiceTest {
         assertEquals(1, result.size());
         PointResponseDto dto = result.get(0);
 
-        assertEquals(mockPoint.getAmount(), dto.getAvailableAmount());
+        assertEquals(mockPoint.getCurrentAmount(), dto.getAvailableAmount());
         assertEquals(mockParty.getAmount(), dto.getChargedAmount());
         assertEquals(mockParty.getName(), dto.getPartyName());
         assertEquals(mockParty.isSunday(), dto.isSunday());

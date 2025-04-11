@@ -1,7 +1,6 @@
 package com.onspring.onspring_customer.domain.user.entity;
 
 import com.onspring.onspring_customer.domain.common.entity.BaseEntity;
-import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -34,9 +33,6 @@ public class EndUser extends BaseEntity {
 
     @NotNull
     private boolean isActivated;
-
-    @OneToMany(mappedBy = "endUser")
-    private Set<PartyEndUser> partyEndUsers = new HashSet<>();
 
     @OneToMany(mappedBy = "endUser")
     private Set<Point> points = new HashSet<>();

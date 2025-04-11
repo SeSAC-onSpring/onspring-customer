@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::div.home-content}, '', ~{::title})}">
+<head>
+  <title>SeSAC 관리자 페이지</title>
+</head>
+<body>
+<div class="home-content" style="padding: 20px;">
+  <h1>SeSAC 식권 관리자 페이지</h1>
+  <p>안녕하세요, <span th:text="${userName}">사용자</span>님!</p>
+  <p>왼쪽 메뉴에서 원하는 기능을 선택하세요.</p>
+</div>
+</body>
+</html>

@@ -1,19 +1,22 @@
 package com.onspring.onspring_customer.domain.user.dto;
 
+import com.onspring.onspring_customer.domain.customer.dto.PartyDto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @NoArgsConstructor(force = true)
 public class EndUserDto implements Serializable {
     Long id;
 
-    Long partyId;
+    PartyDto partyDto;
+
+    private List<PartyDto> parties;
 
     String password;
 
@@ -27,5 +30,7 @@ public class EndUserDto implements Serializable {
 
     boolean isActivated;
 
-    BigDecimal currentPoint;
+    private List<Long> partyIds;
+
+    private List<Long> pointIds;
 }

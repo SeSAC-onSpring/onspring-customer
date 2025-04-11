@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layout(~{::div}, 'party-members', ~{::title})">
+<head>
+    <title>그룹 회원 관리 - SeSAC 회원 관리</title>
+</head>
+<body>
+<div class="content-container">
+    <!-- 페이지 경로 -->
+    <div class="page-path">
+        <span class="path-item">그룹 관리</span>
+        <span class="path-separator">></span>
+        <span class="path-item current">그룹 회원 관리</span>
+    </div>
+
+    <!-- 검색 폼 -->
+    <div class="search-form" style="margin-bottom: 20px;">
+        <form action="#" method="get" style="display: flex;">
+            <select name="searchType"
+                    style="width: 150px; padding: 8px; border: 1px solid #ddd; border-radius: 4px 0 0 4px; border-right: none;">
+                <option value="name">그룹이름</option>
+
+            </select>
+            <input type="text" name="keyword" placeholder="검색어를 입력하세요"
+                   style="flex-grow: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 0;">
+            <button type="submit"
+                    style="width: 80px; background-color: #4CAF50; color: white; border: none; border-radius: 0 4px 4px 0; cursor: pointer;">
+                검색
+            </button>
+        </form>
+    </div>
+
+    <!-- 회원 목록 테이블 -->
+    <div class="form-container">
+        <table style="width: 100%; border-collapse: collapse; text-align: center;">
+            <thead>
+            <tr style="background-color: #f2f2f2; height: 40px;">
+                <th style="width: 10%;">No</th>
+                <th style="width: 30%;">그룹이름</th>
+                <th style="width: 40%;">소속 회원</th>
+                <th style="width: 20%;">소속 회원 수정</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;" th:each="model : ${models}"
+                th:id="${model.partyDto.id}" th:object="${model}">
+                <td th:text="*{partyDto.id}"></td>
+                <td th:text="*{partyDto.name}"></td>
+                <td th:text="${#strings.listJoin(model.endUserDtoList.![name], ', ')}"></td>
+                <td>
+                    <button style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">
+                        수정
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

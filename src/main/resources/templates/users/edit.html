@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layout(~{::div}, 'member-manage', ~{::title})">
+<head>
+  <title>회원 정보 수정 - 회원 관리</title>
+</head>
+<body>
+<div class="content-container">
+  <!-- 페이지 경로 -->
+  <div class="page-path">
+    <span class="path-item">회원 관리</span>
+    <span class="path-separator">></span>
+    <span class="path-item current">회원 정보 수정</span>
+  </div>
+
+  <!-- 디버깅 정보 (개발 중에만 사용) -->
+  <div style="background-color: #f8f8f8; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; display: none;">
+    <p>현재 사용자 ID: <span th:text="${user.id}"></span></p>
+    <p>현재 그룹 IDs: <span th:text="${user.partyIds}"></span></p>
+  </div>
+
+  <form th:action="@{/view/users/edit/{id}(id=${user.id})}" method="post" id="editUserForm">
+    <!-- 회원 추가 폼 -->
+    <div class="form-container">
+      <table class="form-table">
+        <tr>
+          <th>이름</th>
+          <td>
+            <input type="text" id="name" class="form-input" name="name"
+                   th:value="${user.name}" required/>
+          </td>
+        </tr>
+        <tr>
+          <th>아이디 (전화번호)</th>
+          <td>
+            <input type="text" id="phone" class="form-input" name="phone"
+                   th:value="${user.phone}" required/>
+          </td>
+        </tr>
+        <tr>
+          <th>그룹 (여러개 선택 가능)</th>
+          <td>
+            <div style="max-height: 200px; overflow-y: auto; border: 1px solid #e0e0e0; padding: 10px; border-radius: 4px;">
+              <!-- 선택된 그룹 상태 표시 -->
+              <div style="margin-bottom: 10px; font-size: 13px; color: #666;">
+                선택된 그룹: <span id="selectedGroups"></span>
+              </div>
+
+              <!-- 그룹 목록 -->
+              <div th:each="party : ${parties}" style="margin-bottom: 8px;">
+                <input type="checkbox"
+                       th:id="'party-' + ${party.id}"
+                       name="partyIds"
+                       th:value="${party.id}"
+                       th:checked="${user.partyIds != null && user.partyIds.contains(party.id)}"
+                       onchange="updateSelectedGroups()"/>
+                <label th:for="'party-' + ${party.id}" th:text="${party.name}" style="margin-left: 5px;"></label>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="btn-container">
+      <button type="button" onclick="submitForm()" class="submit-btn">확인</button>
+      <button type="button" class="cancel-btn" onclick="location.href='/view/users/list'">취소</button>
+    </div>
+  </form>
+
+  <script>
+    // 페이지 로드 시 선택된 그룹 표시 업데이트
+    document.addEventListener('DOMContentLoaded', function() {
+      updateSelectedGroups();
+    });
+
+    // 선택된 그룹 표시 업데이트 함수
+    function updateSelectedGroups() {
+      const checkboxes = document.querySelectorAll('input[name="partyIds"]:checked');
+      const selectedGroupsElement = document.getElementById('selectedGroups');
+
+      if (checkboxes.length === 0) {
+        selectedGroupsElement.textContent = '없음';
+        return;
+      }
+
+      const groups = [];
+      checkboxes.forEach(function(checkbox) {
+        const labelElement = document.querySelector('label[for="' + checkbox.id + '"]');
+        if (labelElement) {
+          groups.push(labelElement.textContent);
+        }
+      });
+
+      selectedGroupsElement.textContent = groups.join(', ');
+    }
+
+    // 폼 제출 전 확인
+    function submitForm() {
+      // 폼 데이터 확인 (디버깅용)
+      const formData = new FormData(document.getElementById('editUserForm'));
+      console.log('제출할 데이터:');
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
+
+      // 폼 제출
+      document.getElementById('editUserForm').submit();
+    }
+  </script>
+</div>
+</body>
+</html>

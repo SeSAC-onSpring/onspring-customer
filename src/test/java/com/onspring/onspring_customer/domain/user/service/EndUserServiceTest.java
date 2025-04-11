@@ -1,13 +1,13 @@
 package com.onspring.onspring_customer.domain.user.service;
 
 
-import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
-import com.onspring.onspring_customer.domain.common.repository.PartyEndUserRepository;
 import com.onspring.onspring_customer.domain.customer.entity.Party;
 import com.onspring.onspring_customer.domain.customer.repository.PartyRepository;
 import com.onspring.onspring_customer.domain.user.dto.EndUserDto;
 import com.onspring.onspring_customer.domain.user.entity.EndUser;
+import com.onspring.onspring_customer.domain.user.entity.Point;
 import com.onspring.onspring_customer.domain.user.repository.EndUserRepository;
+import com.onspring.onspring_customer.domain.user.repository.PointRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,15 +16,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+
 import java.math.BigDecimal;
 import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-
 class EndUserServiceTest {
 
     @Mock
@@ -34,7 +35,7 @@ class EndUserServiceTest {
     private PartyRepository partyRepository;
 
     @Mock
-    private PartyEndUserRepository partyEndUserRepository;
+    private PointRepository pointRepository;
 
     @Mock
     private ModelMapper modelMapper;
@@ -45,8 +46,8 @@ class EndUserServiceTest {
     private EndUserDto endUserDto;
     private EndUser endUser;
     private Party party;
-    private PartyEndUser partyEndUser;
-  
+    private Point point;
+
     @BeforeEach
     void setUp() {
         party = Party.builder()
@@ -55,9 +56,10 @@ class EndUserServiceTest {
 
         endUserDto = new EndUserDto(1L, 1L, "password", "user", "0123456789", true, new BigDecimal(0));
 
-        partyEndUser = new PartyEndUser();
-        partyEndUser.setId(1L);
-        partyEndUser.setParty(party);
+        point = Point.builder()
+                .id(1L)
+                .party(party)
+                .build();
 
         endUser = EndUser.builder()
                 .id(1L)
@@ -66,20 +68,22 @@ class EndUserServiceTest {
                 .isActivated(true)
                 .build();
 
-        partyEndUser.setEndUser(endUser);
+        point.setEndUser(endUser);
     }
 
     @Test
     void testSaveEndUser() {
         when(modelMapper.map(any(EndUserDto.class), any())).thenReturn(endUser);
-        when(partyRepository.findById(endUserDto.getPartyId())).thenReturn(Optional.of(party));
+        when(partyRepository.findById(endUserDto.getPartyIds()
+                .get(Math.toIntExact(party.getId())))).thenReturn(Optional.of(party));
         when(endUserRepository.save(any(EndUser.class))).thenReturn(endUser);
 
         endUserService.saveEndUser(endUserDto);
 
         verify(endUserRepository).save(endUser);
-        verify(partyRepository).findById(endUserDto.getPartyId());
-        verify(partyEndUserRepository).save(any(PartyEndUser.class));
+        verify(partyRepository).findById(endUserDto.getPartyIds()
+                .get(Math.toIntExact(party.getId())));
+        verify(pointRepository).save(any(Point.class));
     }
 
     @Test

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layout(~{::div}, 'member-manage', ~{::title})">
+<head>
+    <title>회원 관리 - SeSAC 회원 관리</title>
+</head>
+<body>
+<div class="content-container">
+    <!-- 페이지 경로 -->
+    <div class="page-path">
+        <span class="path-item">회원 관리</span>
+        <span class="path-separator">></span>
+        <span class="path-item current">회원 관리</span>
+    </div>
+
+    <!-- 검색 폼 -->
+    <div class="search-form" style="margin-bottom: 20px;">
+        <form action="#" method="get" style="display: flex;">
+            <select name="searchType" style="width: 150px; padding: 8px; border: 1px solid #ddd; border-radius: 4px 0 0 4px; border-right: none;">
+                <option value="name">이름</option>
+                <option value="id">아이디</option>
+                <option value="party">그룹</option>
+
+            </select>
+            <input type="text" name="keyword" placeholder="검색어를 입력하세요" style="flex-grow: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 0;">
+            <button type="submit" style="width: 80px; background-color: #4CAF50; color: white; border: none; border-radius: 0 4px 4px 0; cursor: pointer;">검색</button>
+        </form>
+    </div>
+
+    <!-- 전체 선택 버튼-->
+    <div style="margin-top: 20px; margin-bottom: 10px; text-align: right;" >
+        <button id="allCheck" onclick="toggleAllCheckboxes()" style="background-color: #f2f2f2; color: black; border: none; border-radius: 4px; padding: 8px 15px; cursor: pointer; margin-left: 10px;">전체 선택</button>
+    </div>
+
+    <!-- 회원 목록 테이블 -->
+    <div class="form-container">
+        <table style="width: 100%; border-collapse: collapse; text-align: center;">
+            <thead>
+            <tr style="background-color: #f2f2f2; height: 40px;">
+                <th style="width: 5%;">No</th>
+                <th style="width: 10%;">이름</th>
+                <th style="width: 10%;">아이디</th>
+                <th style="width: 10%;">비밀번호</th>
+                <th style="width: 12%;">생년월일</th>
+                <th style="width: 35%;">그룹</th>
+                <th style="width: 8%;">정보 수정</th>
+                <th style="width: 5%;">선택</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;">
+                <td>3</td>
+                <td>김자바</td>
+                <td>01045644565</td>
+                <td>rlawkqk12</td>
+                <td>1998.08.18</td>
+                <td>신입 개발자를 위한 자바 백엔드 실무 과정</td>
+                <td>
+                    <button style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">수정</button>
+                </td>
+                <td>
+                    <input type="checkbox" name="selectedMember" value="3" class="member-checkbox" style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+                </td>
+            </tr>
+            <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;">
+                <td>2</td>
+                <td>이분석</td>
+                <td>01066564435</td>
+                <td>dlqnstjr33</td>
+                <td>1991.03.22</td>
+                <td>디지털 마케팅 취업을 위한 인공지능 데이터 분석</td>
+                <td>
+                    <button style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">수정</button>
+                </td>
+                <td>
+                    <input type="checkbox" name="selectedMember" value="2" class="member-checkbox" style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+                </td>
+            </tr>
+            <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;">
+                <td>1</td>
+                <td>최자인</td>
+                <td>01033546656</td>
+                <td>chlwkdls13</td>
+                <td>1996.06.04</td>
+                <td>빠른 취업을 위한 실무 웹 UI 응용 디자인</td>
+                <td>
+                    <button style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;">수정</button>
+                </td>
+                <td>
+                    <input type="checkbox" name="selectedMember" value="1" class="member-checkbox" style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 비활성화 버튼 -->
+    <div style="margin-top: 10px; text-align: right;">
+        <button id="deactivateBtn" th:onclick="'deactivateMembers()'" style="background-color: #f44336; color: white; border: none; border-radius: 4px; padding: 8px 15px; cursor: pointer; margin-left: 10px;">비활성화</button>
+    </div>
+
+
+
+    <!-- 페이지네이션 -->
+    <div style="margin-top: 30px; text-align: center;">
+        <div style="display: inline-block;">
+            <a href="#" style="display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; color: #333;">&lt;</a>
+            <a href="#" style="display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; color: white; background-color: #4CAF50;">1</a>
+            <a href="#" style="display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; color: #333;">2</a>
+            <a href="#" style="display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; color: #333;">3</a>
+            <a href="#" style="display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; color: #333;">4</a>
+            <a href="#" style="display: inline-block; padding: 5px 10px; margin: 0 5px; border: 1px solid #ddd; text-decoration: none; color: #333;">&gt;</a>
+        </div>
+    </div>
+
+    <script>
+        // 전체선택 버튼
+        let allChecked = false;
+
+        function toggleAllCheckboxes() {
+
+            allChecked = !allChecked;
+
+            const checkboxes = document.querySelectorAll('.member-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = allChecked;
+            });
+
+            const allCheckBtn = document.getElementById('allCheck');
+            allCheckBtn.textContent = allChecked ? '전체 해제' : '전체 선택';
+        }
+
+        // 비활성화 버튼
+        function deactivateMembers() {
+            const selectedMembers = document.querySelectorAll('input[name="selectedMember"]:checked');
+
+            if (selectedMembers.length === 0) {
+                alert('비활성화할 회원을 선택해주세요.');
+                return;
+            }
+
+            if (confirm(selectedMembers.length + '명의 회원을 비활성화하시겠습니까?')) {
+                alert('선택한 회원이 비활성화되었습니다.');
+            }
+        }
+
+
+    </script>
+</div>
+
+
+
+</body>
+</html>

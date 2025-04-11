@@ -14,6 +14,8 @@ public interface EndUserService {
 
     EndUserDto findEndUserById(Long id);
 
+    List<EndUserDto> findEndUserById(List<Long> ids);
+
     List<EndUserDto> findAllEndUser();
 
     Page<EndUserDto> findAllEndUserByQuery(String name, String partyName, String phone, boolean isActivated,
@@ -21,13 +23,19 @@ public interface EndUserService {
 
     Page<PointDto> findPointByEndUserId(Long id, Pageable pageable);
 
-    PointDto findAvailablePointByEndUserIdAndPartyId(Long endUserId, Long partyId);
+    boolean updateEndUser(EndUserDto endUserDto);
 
     boolean updateEndUserPasswordById(Long id, String password);
+
+    boolean updateEndUserPasswordById(Long id, String oldPassword, String newPassword);
 
     boolean assignPointToEndUserById(Long endUserId, Long partyId, BigDecimal amount, LocalDateTime validThru);
 
     boolean activateEndUserById(Long id);
 
+    List<Boolean> activateEndUserById(List<Long> ids);
+
     boolean deactivateEndUserById(Long id);
+
+    List<Boolean> deactivateEndUserById(List<Long> ids);
 }

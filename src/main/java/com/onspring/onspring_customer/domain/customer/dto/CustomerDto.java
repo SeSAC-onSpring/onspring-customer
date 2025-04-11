@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Value;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Value
 @Builder
@@ -25,4 +26,8 @@ public class CustomerDto implements Serializable {
     String phone;
 
     boolean isActivated;
+
+    List<Long> adminIds;
+
+    List<Long> partyIds;
 }

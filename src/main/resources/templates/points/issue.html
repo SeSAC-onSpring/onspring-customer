@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layout(~{::div}, 'point-issue', ~{::title})">
+<head>
+    <title>포인트 지급 - SeSAC 회원 관리</title>
+</head>
+<body>
+<div class="content-container">
+
+    <!-- 페이지 경로 -->
+    <div class="page-path">
+        <span class="path-item">포인트 관리</span>
+        <span class="path-separator">></span>
+        <span class="path-item current">포인트 지급</span>
+    </div>
+
+    <!-- 검색 폼 -->
+    <div class="search-form" style="margin-bottom: 20px;">
+        <form action="#" method="get" style="display: flex;">
+            <select name="searchType"
+                    style="width: 150px; padding: 8px; border: 1px solid #ddd; border-radius: 4px 0 0 4px; border-right: none;">
+                <option value="name">이름</option>
+                <option value="id">아이디</option>
+                <option value="party">그룹</option>
+
+            </select>
+            <input type="text" name="keyword" placeholder="검색어를 입력하세요"
+                   style="flex-grow: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 0;">
+            <button type="submit"
+                    style="width: 80px; background-color: #4CAF50; color: white; border: none; border-radius: 0 4px 4px 0; cursor: pointer;">
+                검색
+            </button>
+        </form>
+    </div>
+
+    <!-- 회원 목록 테이블 -->
+    <div class="form-container">
+        <table style="width: 100%; border-collapse: collapse; text-align: center;">
+            <thead>
+            <tr style="background-color: #f2f2f2; height: 40px;">
+                <th style="width: 5%;">No</th>
+                <th style="width: 25%;">그룹이름</th>
+                <th style="width: 10%;">거래금액한도</th>
+                <th style="width: 10%;">거래횟수한도</th>
+                <th style="width: 10%;">유효시간</th>
+                <th style="width: 10%;">가용시작일</th>
+                <th style="width: 10%;">가용종료일</th>
+                <th style="width: 10%;">사용가능일</th>
+                <th style="width: 10%;">충전하기</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr style="height: 50px; border-bottom: 1px solid #e0e0e0;" th:each="party : ${parties}" th:id="${party.id}"
+                th:object="${party}">
+                <td th:text="*{id}"></td>
+                <td th:text="*{name}"></td>
+                <td th:text="*{maximumAmount}"></td>
+                <td th:text="*{maximumTransaction}"></td>
+                <td th:text="*{allowedTimeStart} + ' ~ ' + *{allowedTimeEnd}"></td>
+                <td>?</td>
+                <td>?</td>
+                <td th:text="*{getFormattedDays}"></td>
+                <td>
+                    <button style="background-color: #4CAF50; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer;" th:onclick="|location.href='add/*{id}'|">
+                        충전
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+</body>
+
+</html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content, activeMenu, title)">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:replace="${title}">SeSAC 관리자 페이지</title>
+
+  <!-- Google Fonts - Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 200px;
+      height: 100%;
+      border-right: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-container {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #e0e0e0;
+      height: 80px;
+    }
+
+    .logo {
+      width: 120px;
+      height: auto;
+    }
+
+    .menu-container {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .menu-item {
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #333;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .menu-item:hover {
+      background-color: #f9f9f9;
+    }
+
+    .menu-item span {
+      font-size: 14px;
+    }
+
+    .arrow {
+      font-size: 14px;
+      transition: transform 0.3s;
+    }
+
+
+    .menu-item.active {
+      color: #4CAF50;
+      font-weight: 1000;
+    }
+
+    .menu-item.active .arrow {
+      transform: rotate(90deg);
+      color: #4CAF50;
+    }
+
+
+    .submenu {
+      background-color: #f6f6f6;
+      display: none;
+      flex-direction: column;
+    }
+
+    .submenu.open {
+      display: flex;
+    }
+
+    .submenu-item {
+      padding: 12px 20px 12px 30px;
+      font-size: 13px;
+      color: #555;
+      text-decoration: none;
+      display: block;
+    }
+
+    .submenu-item:hover {
+      background-color: #e0e0e0;
+    }
+
+    .main-content {
+      flex-grow: 1;
+      padding: 0;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 80px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .info-item {
+      padding: 0 20px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px solid #e0e0e0;
+      min-width: 380px;
+    }
+
+    .info-item:first-child {
+      padding-left: 20px;
+      border-left: 1px solid #e0e0e0;
+    }
+
+    .logout-container {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      border-left: 1px solid #e0e0e0;
+    }
+
+    .logout-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #4CAF50;
+      text-decoration: none;
+    }
+
+    .logout-icon {
+      margin-bottom: 5px;
+    }
+
+    /* 회원 추가 폼 스타일 */
+    .content-container {
+      padding: 20px;
+    }
+
+    .page-path {
+      margin-bottom: 20px;
+      font-size: 14px;
+
+    }
+
+    .path-item {
+      color: #555;
+    }
+
+    .path-item.current {
+      color: #4CAF50;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .path-separator {
+      margin: 0 8px;
+      color: #ccc;
+    }
+
+    .form-container {
+      padding-top:10px;
+      padding-bottom: 10px;
+      border-top: 1px solid #4CAF50;
+      border-bottom: 1px solid #4CAF50;
+
+    }
+
+    .form-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .form-table th {
+      width: 120px;
+      text-align: left;
+      padding: 12px 10px;
+      vertical-align: top;
+    }
+
+    .form-table td {
+      padding: 8px 10px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .btn-container {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .submit-btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .submit-btn:hover {
+      background-color: #4CAF50;
+    }
+
+    /* 취소 버튼 스타일 */
+    .cancel-btn {
+      background-color: white;
+      color: #4CAF50;
+      border: 1px solid #4CAF50;
+      border-radius: 4px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: 10px;
+    }
+
+  </style>
+</head>
+
+
+<body>
+<!-- 사이드바 -->
+<div class="sidebar">
+  <!-- 로고 영역 -->
+  <div class="logo-container">
+    <a href="/view/home">
+      <img class="logo" src="/images/logo.png" alt="Seoul Software Academy Logo" />
+    </a>
+  </div>
+
+  <!-- 메뉴 영역 -->
+  <div class="menu-container">
+    <!-- 회원 관리 메뉴 -->
+    <div id="member-menu" class="menu-item" onclick="toggleSubmenu('member-menu', 'member-submenu')">
+      <span>회원 관리</span>
+      <span class="arrow">›</span>
+    </div>
+    <div id="member-submenu" class="submenu">
+      <a href="/view/users/add" class="submenu-item">회원 추가</a>
+      <a href="/view/users/list" class="submenu-item">회원 관리</a>
+      <a href="/view/users/activate" class="submenu-item">회원 활성화</a>
+    </div>
+
+    <!-- 포인트 관리 메뉴 -->
+    <div id="point-menu" class="menu-item" onclick="toggleSubmenu('point-menu', 'point-submenu')">
+      <span>포인트 관리</span>
+      <span class="arrow">›</span>
+    </div>
+    <div id="point-submenu" class="submenu">
+      <a href="/view/points/issue" class="submenu-item">포인트 지급</a>
+      <a href="/view/points/modify" class="submenu-item">포인트 수정</a>
+    </div>
+
+    <!-- 그룹 관리 메뉴 -->
+    <div id="party-menu" class="menu-item" onclick="toggleSubmenu('party-menu', 'party-submenu')">
+      <span>그룹 관리</span>
+      <span class="arrow">›</span>
+    </div>
+    <div id="party-submenu" class="submenu">
+      <a href="/view/parties/add" class="submenu-item">그룹 생성</a>
+      <a href="/view/parties/list" class="submenu-item">그룹 관리</a>
+      <a href="/view/parties/users" class="submenu-item">그룹 회원 관리</a>
+    </div>
+
+    <!-- 가맹점 관리 메뉴 -->
+    <div id="franchise-menu" class="menu-item" onclick="toggleSubmenu('franchise-menu', 'franchise-submenu')">
+      <span>가맹점 관리</span>
+      <span class="arrow">›</span>
+    </div>
+    <div id="franchise-submenu" class="submenu">
+      <a href="/view/franchises/add" class="submenu-item">가맹점 추가</a>
+      <a href="/view/franchises/list" class="submenu-item">가맹점 관리</a>
+      <a href="/view/franchises/activate" class="submenu-item">가맹점 활성화</a>
+    </div>
+
+    <!-- 거래 관리 메뉴 -->
+    <div id="transaction-menu" class="menu-item" onclick="toggleSubmenu('transaction-menu', 'transaction-submenu')">
+      <span>거래 관리</span>
+      <span class="arrow">›</span>
+    </div>
+    <div id="transaction-submenu" class="submenu">
+      <a href="/view/transactions/by-franchise" class="submenu-item">가맹점 조회</a>
+      <a href="/view/transactions/by-group" class="submenu-item">그룹 조회</a>
+      <a href="/view/transactions/by-user" class="submenu-item">회원 조회</a>
+    </div>
+
+    <!-- 정산 관리 메뉴 -->
+    <div id="settlement-menu" class="menu-item" onclick="toggleSubmenu('settlement-menu', 'settlement-submenu')">
+      <span>정산 관리</span>
+      <span class="arrow">›</span>
+    </div>
+    <div id="settlement-submenu" class="submenu">
+      <a href="/view/transactions/close" class="submenu-item">정산</a>
+      <a href="/view/transactions/list" class="submenu-item">정산 관리</a>
+    </div>
+  </div>
+
+    <!-- 비밀번호 변경 영역 -->
+    <a href="/manager/changepassword" class="menu-item">
+      <span>비밀번호 변경</span>
+      <span class="arrow">›</span>
+    </a>
+  </div>
+
+
+<!-- 메인 컨텐츠 영역 -->
+<div class="main-content">
+  <!-- 상단 바 -->
+  <div class="top-bar">
+    <div class="user-info">
+      <div class="info-item">
+        <span>로그인 계정 : <span th:text="${userName}">홍길동</span></span>
+      </div>
+      <div class="info-item">
+        <span>지점 : 은평</span>
+      </div>
+    </div>
+    <!-- 로그아웃 영역 -->
+    <div class="logout-container">
+      <!-- 숨겨진 form -->
+      <form id="logoutForm" th:action="@{/view/logout}" method="post" style="display: none;">
+      </form>
+
+      <!-- a 태그처럼 보이는 버튼 (스타일 유지) -->
+      <a href="#" class="logout-btn" onclick="event.preventDefault(); document.getElementById('logoutForm').submit();">
+        <svg class="logout-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 17L21 12L16 7" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 12H9" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Logout</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 실제 컨텐츠가 들어갈 영역 -->
+  <div th:replace="${content}">
+
+    <!-- 기본 컨텐츠 영역 -->
+    <div style="padding: 20px;">
+      <h1>서울 소프트웨어 아카데미 관리 시스템</h1>
+      <p>왼쪽 메뉴에서 원하는 기능을 선택하세요.</p>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+  // 메뉴를 토글하는 함수
+  function toggleSubmenu(menuId, submenuId) {
+    // 토글할 서브메뉴 요소 가져오기
+    const submenu = document.getElementById(submenuId);
+
+    // 메뉴 아이템 요소 가져오기
+    const menuItem = document.getElementById(menuId);
+
+    // 다른 모든 서브메뉴 닫기
+    const allSubmenus = document.querySelectorAll('.submenu');
+    const allMenuItems = document.querySelectorAll('.menu-item');
+
+    allSubmenus.forEach(item => {
+      if (item.id !== submenuId) {
+        item.classList.remove('open');
+      }
+    });
+
+    allMenuItems.forEach(item => {
+      if (item.id !== menuId) {
+        item.classList.remove('active');
+      }
+    });
+
+    // 서브메뉴 표시 상태 토글
+    if (submenu.classList.contains('open')) {
+      // 이미 열려있으면 닫기
+      submenu.classList.remove('open');
+      menuItem.classList.remove('active');
+    } else {
+      // 닫혀있으면 열기
+      submenu.classList.add('open');
+      menuItem.classList.add('active');
+    }
+  }
+  // activeMenu 파라미터를 활용하여 현재 메뉴 활성화
+  document.addEventListener('DOMContentLoaded', function() {
+    const activeMenu = "[[${activeMenu}]]";
+    if (activeMenu) {
+      if (activeMenu === 'member-add' || activeMenu === 'member-manage' || activeMenu === 'member-activated') {
+        const memberMenu = document.getElementById('member-menu');
+        const memberSubmenu = document.getElementById('member-submenu');
+        memberMenu.classList.add('active');
+        memberSubmenu.classList.add('open');
+      }
+      if (activeMenu === 'point-issue' || activeMenu === 'point-modify') {
+        const pointMenu = document.getElementById('point-menu');
+        const pointSubmenu = document.getElementById('point-submenu');
+        pointMenu.classList.add('active');
+        pointSubmenu.classList.add('open');
+      }
+      if (activeMenu === 'party-add' || activeMenu === 'party-manage' || activeMenu === 'party-members') {
+        const pointMenu = document.getElementById('party-menu');
+        const pointSubmenu = document.getElementById('party-submenu');
+        pointMenu.classList.add('active');
+        pointSubmenu.classList.add('open');
+      }
+      if (activeMenu === 'franchise-add' || activeMenu === 'franchise-manage' || activeMenu === 'franchise-activated') {
+        const pointMenu = document.getElementById('franchise-menu');
+        const pointSubmenu = document.getElementById('franchise-submenu');
+        pointMenu.classList.add('active');
+        pointSubmenu.classList.add('open');
+      }
+      if (activeMenu === 'transaction-franchise' || activeMenu === 'transaction-members' || activeMenu === 'transaction-party') {
+        const pointMenu = document.getElementById('transaction-menu');
+        const pointSubmenu = document.getElementById('transaction-submenu');
+        pointMenu.classList.add('active');
+        pointSubmenu.classList.add('open');
+      }
+      if (activeMenu === 'settlement-registration' || activeMenu === 'settlement-history' ) {
+        const pointMenu = document.getElementById('settlement-menu');
+        const pointSubmenu = document.getElementById('settlement-submenu');
+        pointMenu.classList.add('active');
+        pointSubmenu.classList.add('open');
+      }
+    }
+  });
+</script>
+</body>
+</html>

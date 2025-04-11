@@ -31,7 +31,10 @@ public class Point extends BaseEntity {
     private EndUser endUser;
 
     @NotNull
-    private BigDecimal amount;
+    private BigDecimal assignedAmount;
+
+    @NotNull
+    private BigDecimal currentAmount;
 
     private LocalDateTime validThru;
 

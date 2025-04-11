@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::div.content-container}, 'franchise-add', ~{::title})}">
+<head>
+    <title>가맹점 추가 - SeSAC 관리자 페이지</title>
+</head>
+<body>
+<div class="content-container">
+    <!-- 페이지 경로 표시 -->
+    <div class="page-path">
+        <span class="path-item">가맹점 관리</span>
+        <span class="path-separator">></span>
+        <span class="path-item current">가맹점 추가</span>
+    </div>
+
+    <form action="/franchise/add" method="post">
+        <!-- 회원 추가 폼 -->
+        <div class="form-container">
+            <table class="form-table">
+                <tr>
+                    <th>가맹점명</th>
+                    <td>
+                        <input type="text" id="name" class="form-input" name="name" placeholder="가맹점명을 입력해주세요" required />
+                    </td>
+                </tr>
+                <tr>
+                    <th>사업자번호</th>
+                    <td>
+                        <input type="text" id="salesnumber" class="form-input" name="salesnumber" placeholder="사업자번호를 입력해주세요" required />
+                    </td>
+                </tr>
+                <tr>
+                    <th>대표자</th>
+                    <td>
+                        <input type="text" id="ownername" class="form-input" name="ownername" placeholder="대표자 이름을 입력해주세요" required />
+                    </td>
+                </tr>
+                <tr>
+                    <th>주소</th>
+                    <td>
+                        <input type="text" id="address" class="form-input" name="address" placeholder="주소를 입력해주세요" required />
+                    </td>
+                </tr>
+                <tr>
+                    <th>아이디</th>
+                    <td>
+                        <input type="text" id="id" class="form-input" name="id" placeholder="아이디(연락처)를 입력해주세요" required />
+                    </td>
+                </tr>
+                <tr>
+                    <th>비밀번호</th>
+                    <td>
+                        <input type="password" id="password" class="form-input" name="password" placeholder="비밀번호를 입력해주세요" required />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+
+        <div class="btn-container">
+            <button type="submit" class="submit-btn">등록</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

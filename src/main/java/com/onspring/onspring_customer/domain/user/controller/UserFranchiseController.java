@@ -2,14 +2,20 @@ package com.onspring.onspring_customer.domain.user.controller;
 
 import com.onspring.onspring_customer.domain.franchise.dto.FranchiseDto;
 import com.onspring.onspring_customer.domain.franchise.service.FranchiseService;
+import com.onspring.onspring_customer.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
+@Log4j2
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user/franchises")
@@ -17,13 +23,26 @@ public class UserFranchiseController {
 
     private final FranchiseService franchiseService;
 
-    @GetMapping("/franchises")
-    public ResponseEntity<List<FranchiseDto>> getAllFranchises() {
-        Long userId = 1L; //테스트용 사용자 id
+    @GetMapping("")
+    public ResponseEntity<Page<FranchiseDto>> getAllFranchises(
+            @PageableDefault(sort = "name", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        log.info("pageable: {}", pageable);
+        Long userId = SecurityUtil.getCurrentUserId();
 
-        List<FranchiseDto> franchiseDtoList = franchiseService.findFranchiseListByUserId(userId);
+        Page<FranchiseDto> result = franchiseService.findFranchiseListByUserId(userId, pageable);
 
-        return ResponseEntity.ok(franchiseDtoList);
+        log.info("result" ,result);
+
+        return ResponseEntity.ok(result);
+    }
+    @GetMapping("/{franchiseId}")
+    public ResponseEntity<FranchiseDto> getFranchiseById(@PathVariable Long franchiseId) {
+        log.info("franchiseId: {}", franchiseId);
+
+        FranchiseDto franchise = franchiseService.findFranchiseById(franchiseId);
+
+        return ResponseEntity.ok(franchise);
     }
 
 }

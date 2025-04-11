@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::div.content-container}, 'party-add', ~{::title})}">
+<head>
+  <title>그룹 생성 - SeSAC 관리자 페이지</title>
+</head>
+<body>
+<div class="content-container">
+  <!-- 페이지 경로 표시 -->
+  <div class="page-path">
+    <span class="path-item">그룹 관리</span>
+    <span class="path-separator">></span>
+    <span class="path-item current">그룹 생성</span>
+  </div>
+
+  <form action="/party/add" method="post">
+    <!-- 회원 추가 폼 -->
+    <div class="form-container">
+      <table class="form-table">
+        <tr>
+          <th>그룹명</th>
+          <td>
+            <input type="text" id="name" class="form-input" name="name" placeholder="그룹 이름을 입력해주세요" required />
+          </td>
+        </tr>
+        <tr>
+          <th>거래금액한도</th>
+          <td>
+            <input type="text" id="limit-point" class="form-input" name="limit-point" placeholder="거래금액 한도를 입력해주세요" required />
+          </td>
+        </tr>
+        <tr>
+          <th>거래횟수한도</th>
+          <td>
+            <input type="text" id="times-point" class="form-input" name="times-point" placeholder="거래횟수 한도를 입력해주세요" required />
+          </td>
+        </tr>
+
+        <tr>
+          <th>유효시간</th>
+          <td>
+            <div class="time-range" style="display: flex; align-items: center;">
+              <input type="time" id="start-time" class="form-input" name="startTime" required />
+              <span class="time-separator" style="margin: 0 10px;">~</span>
+              <input type="time" id="end-time" class="form-input" name="endTime" required />
+              <input type="hidden" id="validPeriod" name="validPeriod" />
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <th>가용시작일</th>
+          <td>
+            <input type="date" id="start-date" class="form-input" name="start-date" value="년-월-일" required />
+          </td>
+        </tr>
+        <tr>
+          <th>가용종료일</th>
+          <td>
+            <input type="date" id="end-date" class="form-input" name="end-date" value="년-월-일" required />
+          </td>
+        </tr>
+        <tr>
+          <th>사용가능일</th>
+          <td>
+            <div class="day-select" style="display: flex; align-items: center;">
+              <label style="margin-right: 15px; display: flex; align-items: center;">
+                <span style="display: inline-block;">월</span>
+                <input type="checkbox" name="selectedday" value="1" class="party-checkbox" style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+              </label>
+              <label style="margin-right: 15px; display: flex; align-items: center;">
+                <span style="display: inline-block;">화</span>
+                <input type="checkbox" name="selectedday" value="2" class="party-checkbox" style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+              </label>
+              <label style="margin-right: 15px; display: flex; align-items: center;">
+                <span style="display: inline-block;">수</span>
+                <input type="checkbox" name="selectedday" value="3" class="party-checkbox" style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+              </label>
+              <label style="margin-right: 15px; display: flex; align-items: center;">
+                <span style="display: inline-block;">목</span>
+                <input type="checkbox" name="selectedday" value="4" class="party-checkbox" style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+              </label>
+              <label style="margin-right: 15px; display: flex; align-items: center;">
+                <span style="display: inline-block;">금</span>
+                <input type="checkbox" name="selectedday" value="5" class="party-checkbox" style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+              </label>
+              <label style="margin-right: 15px; display: flex; align-items: center;">
+                <span style="display: inline-block;">토</span>
+                <input type="checkbox" name="selectedday" value="6" class="party-checkbox" style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+              </label>
+              <label style="margin-right: 15px; display: flex; align-items: center;">
+                <span style="display: inline-block;">일</span>
+                <input type="checkbox" name="selectedday" value="7" class="party-checkbox" style="width: 18px; height: 18px; margin-left: 5px; vertical-align: middle;">
+              </label>
+            </div>
+          </td>
+        </tr>
+
+      </table>
+    </div>
+
+
+    <div class="btn-container">
+      <button type="submit" class="submit-btn">등록</button>
+    </div>
+
+    <!-- Flatpickr 라이브러리 추가 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const startTime = document.getElementById('start-time');
+        const endTime = document.getElementById('end-time');
+        const validPeriod = document.getElementById('validPeriod');
+
+        // 시작 시간이나 종료 시간이 변경될 때 validPeriod 값 업데이트
+        function updateValidPeriod() {
+          if (startTime.value && endTime.value) {
+            validPeriod.value = startTime.value + ' ~ ' + endTime.value;
+          }
+        }
+
+        startTime.addEventListener('change', updateValidPeriod);
+        endTime.addEventListener('change', updateValidPeriod);
+
+        // 폼 제출 전에 validPeriod 값 설정
+        document.querySelector('form').addEventListener('submit', function(e) {
+          updateValidPeriod();
+        });
+      });
+    </script>
+  </form>
+
+
+</div>
+</body>
+</html>

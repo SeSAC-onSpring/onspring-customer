@@ -12,6 +12,9 @@ import java.time.LocalTime;
 @AllArgsConstructor
 public class PointResponseDto {
 
+    Long pointId;
+    Long partyId;
+
     BigDecimal availableAmount;
     BigDecimal chargedAmount;
 
@@ -26,6 +29,11 @@ public class PointResponseDto {
     boolean saturday;
 
     boolean isActivated;
+
+    Long maximumTransaction;
+    BigDecimal maximumAmount;
+
+    LocalDateTime createdTime;
 
     LocalTime allowedTimeStart;
     LocalTime allowedTimeEnd;

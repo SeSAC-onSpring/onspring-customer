@@ -44,9 +44,19 @@ public class Franchise extends BaseEntity {
     @Column(unique = true)
     private String address;
 
+    @Column
+    private Double latitude;
+
+    @Column
+    private Double longitude;
+
+
     @NotNull
     @Column(unique = true)
     private String phone;
+
+    @Column
+    private String description;
 
     @NotNull
     private boolean isActivated;
@@ -83,6 +93,7 @@ public class Franchise extends BaseEntity {
                 .phone(this.phone)
                 .businessNumber(this.businessNumber)
                 .ownerName(this.ownerName)
+                .description(this.description)
                 .build();
 
         // 이미지 파일 리스트 변환

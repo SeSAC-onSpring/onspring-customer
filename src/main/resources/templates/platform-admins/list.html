@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Platform Admins List</title>
+</head>
+<body>
+<h1>Platform Admins</h1>
+<form action="" method="get">
+    <label for="userName">User Name:</label>
+    <input type="text" name="userName" id="userName" data-th-value="${param.userName ?: ''}"/>
+    <label for="showDeactivated">Show Deactivated Admins:</label>
+    <input type="checkbox" name="showDeactivated" id="showDeactivated"
+           data-th-checked="${param.showDeactivated}" value="true"/>
+    <button type="submit">Search</button>
+</form>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>User Name</th>
+        <th>Activated</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr data-th-each="admin : ${platformAdmins}">
+        <td data-th-text="${admin.id}"></td>
+        <td data-th-text="${admin.userName}"></td>
+        <td data-th-text="${admin.activated}"></td>
+        <td>
+            <form action="update-password" method="post">
+                <input type="hidden" name="id" data-th-value="${admin.id}"/>
+                <input type="text" name="newPassword" placeholder="New Password" required/>
+                <button type="submit">Change Password</button>
+            </form>
+            <form action="#" method="post" data-th-action="'activate?id=' + ${admin.id}"
+                  data-th-if="${!admin.activated}">
+                <button type="submit">Activate</button>
+            </form>
+            <form action="#" method="post" data-th-action="'deactivate?id=' + ${admin.id}"
+                  data-th-if="${admin.activated}">
+                <button type="submit">Deactivate</button>
+            </form>
+            <form action="#" method="post" data-th-action="'?id='+ ${admin.id}">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<p data-th-text="'Showing page ' + ${currentPage} + ' of ' + ${totalPages}"></p>
+<ul>
+    <li data-th-if="${currentPage > 1}">
+        <a data-th-href="@{list(page=${currentPage - 1})}">Previous</a>
+    </li>
+    <li data-th-each="pageNum : ${#numbers.sequence(1, totalPages)}">
+        <a data-th-href="@{list(page=${pageNum})}" data-th-text="${pageNum}"></a>
+    </li>
+    <li data-th-if="${currentPage < totalPages}">
+        <a data-th-href="@{list(page=${currentPage + 1})}">Next</a>
+    </li>
+</ul>
+<a href="./add">Add New Platform Admin</a>
+</body>
+</html>

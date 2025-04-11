@@ -2,27 +2,31 @@ package com.onspring.onspring_customer.domain.common.service;
 
 import com.onspring.onspring_customer.domain.common.dto.PlatformAdminDto;
 import com.onspring.onspring_customer.domain.common.entity.PlatformAdmin;
+import com.onspring.onspring_customer.domain.common.entity.QPlatformAdmin;
 import com.onspring.onspring_customer.domain.common.repository.PlatformAdminRepository;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Log4j2
+@RequiredArgsConstructor
 @Service
 public class PlatformAdminServiceImpl implements PlatformAdminService {
     private final PlatformAdminRepository platformAdminRepository;
     private final ModelMapper modelMapper;
+    private final JPAQueryFactory queryFactory;
 
-    @Autowired
-    public PlatformAdminServiceImpl(PlatformAdminRepository platformAdminRepository, ModelMapper modelMapper) {
-        this.platformAdminRepository = platformAdminRepository;
-        this.modelMapper = modelMapper;
-    }
 
     private PlatformAdmin getPlatformAdmin(Long id) {
         Optional<PlatformAdmin> result = platformAdminRepository.findById(id);
@@ -77,6 +81,35 @@ public class PlatformAdminServiceImpl implements PlatformAdminService {
                 .stream()
                 .map(element -> modelMapper.map(element, PlatformAdminDto.class))
                 .toList();
+    }
+
+    @Override
+    public Page<PlatformAdminDto> findAllPlatformAdminByQuery(String userName, boolean isActivated, Pageable pageable) {
+        QPlatformAdmin platformAdmin = QPlatformAdmin.platformAdmin;
+        JPAQuery<PlatformAdmin> query = queryFactory.selectFrom(platformAdmin);
+
+        if (userName != null) {
+            query.where(platformAdmin.userName.containsIgnoreCase(userName));
+        }
+        if (isActivated) {
+            query.where(platformAdmin.isActivated);
+        }
+
+        Long count = Objects.requireNonNull(query.clone()
+                .select(platformAdmin.count())
+                .fetchOne());
+
+        query.orderBy(platformAdmin.id.desc());
+        query.offset(pageable.getOffset());
+        query.limit(pageable.getPageSize());
+
+        List<PlatformAdmin> platformAdminList = query.fetch();
+
+        List<PlatformAdminDto> platformAdminDtoList = platformAdminList.stream()
+                .map(element -> modelMapper.map(element, PlatformAdminDto.class))
+                .toList();
+
+        return new PageImpl<>(platformAdminDtoList, pageable, count);
     }
 
     /**

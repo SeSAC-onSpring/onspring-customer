@@ -1,11 +1,9 @@
 package com.onspring.onspring_customer.global.config;
 
 import com.onspring.onspring_customer.domain.common.entity.CustomerFranchise;
-import com.onspring.onspring_customer.domain.common.entity.PartyEndUser;
 import com.onspring.onspring_customer.domain.common.entity.PlatformAdmin;
 import com.onspring.onspring_customer.domain.common.entity.Transaction;
 import com.onspring.onspring_customer.domain.common.repository.CustomerFranchiseRepository;
-import com.onspring.onspring_customer.domain.common.repository.PartyEndUserRepository;
 import com.onspring.onspring_customer.domain.common.repository.PlatformAdminRepository;
 import com.onspring.onspring_customer.domain.common.repository.TransactionRepository;
 import com.onspring.onspring_customer.domain.customer.entity.Admin;
@@ -44,7 +42,6 @@ public class DataLoadConfig implements CommandLineRunner {
     private final EndUserRepository endUserRepository;
     private final PartyRepository partyRepository;
     private final TransactionRepository transactionRepository;
-    private final PartyEndUserRepository partyEndUserRepository;
     private final PointRepository pointRepository;
     private final AdminRepository adminRepository;
     private final PlatformAdminRepository platformAdminRepository;
@@ -145,14 +142,14 @@ public class DataLoadConfig implements CommandLineRunner {
         }
 
         // 파티-엔드 유저 관계 데이터가 없으면 관계 추가
-        if (partyEndUserRepository.findAll().isEmpty()) {
-            List<PartyEndUser> partyEndUsers = IntStream.range(0, 1500).mapToObj(i -> {
-                PartyEndUser pe = new PartyEndUser();
-                pe.setParty(partyRepository.findAll().get(random.nextInt(10)));
-                pe.setEndUser(endUserRepository.findAll().get(random.nextInt(100)));
-                return pe;
+        if (pointRepository.findAll().isEmpty()) {
+            List<Point> points = IntStream.range(0, 1500).mapToObj(i -> {
+                Point point = new Point();
+                point.setParty(partyRepository.findAll().get(random.nextInt(10)));
+                point.setEndUser(endUserRepository.findAll().get(random.nextInt(100)));
+                return point;
             }).toList();
-            partyEndUserRepository.saveAll(partyEndUsers);
+            pointRepository.saveAll(points);
         }
 
         // 트랜잭션 데이터가 없으면 트랜잭션 추가
@@ -176,7 +173,7 @@ public class DataLoadConfig implements CommandLineRunner {
                 Point point = new Point();
                 point.setParty(partyRepository.findAll().get(random.nextInt(10)));
                 point.setEndUser(endUserRepository.findAll().get(random.nextInt(100)));
-                point.setAmount(BigDecimal.valueOf(random.nextDouble() * 100));
+                point.setCurrentAmount(BigDecimal.valueOf(random.nextDouble() * 100));
                 point.setValidThru(LocalDateTime.now().plusDays(random.nextInt(365)));
                 return point;
             }).toList();
